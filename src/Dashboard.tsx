@@ -11,9 +11,9 @@ import {
 import {
   Droplets,
   Thermometer,
-  Wind,
   Calendar,
   CircleAlert as AlertCircle,
+  Menu as MenuIcon,
 } from "lucide-react";
 import dayjs from "dayjs";
 import Sidebar from "./Navigation";
@@ -24,10 +24,13 @@ export default function SmartFarmDashboard() {
   const [moistureData, setMoistureData] = useState<AnyRecord[]>([]);
   const [dhtData, setDhtData] = useState<AnyRecord[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const sidebarOpen = true; // Always open on desktop
 
   // Prefer Vite environment variable VITE_API_URL, fallback to local Flask dev server
-  const endpoint = (import.meta.env && import.meta.env.VITE_API_URL) || "http://localhost:5001";
+  const endpoint =
+    (import.meta.env && import.meta.env.VITE_API_URL) ||
+    "http://localhost:5001";
 
   async function fetchTable(table: string) {
     try {
@@ -94,20 +97,42 @@ export default function SmartFarmDashboard() {
   const latestDht = dhtData[dhtData.length - 1];
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50">
-      <div className="fixed h-screen">
-        <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
+    <div
+      className={`flex min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50 ${
+        mobileSidebarOpen ? "overflow-hidden" : ""
+      }`}
+    >
+      <div className="fixed h-screen z-40 md:static md:z-auto">
+        <Sidebar isOpen={mobileSidebarOpen} setIsOpen={setMobileSidebarOpen} />
       </div>
 
-      <div className={`flex-1 p-6 md:p-8 overflow-y-auto ${sidebarOpen ? 'ml-72' : 'ml-20'}`}>
+
+
+      <div className="flex-1 p-6 md:p-8 overflow-y-auto ml-0 md:ml-72">
         <div className="max-w-7xl mx-auto space-y-8">
-          <header className="mb-8">
-            <h1
-              className="text-3xl md:text-4xl font-bold text-slate-800 mb-2"
-              style={{ letterSpacing: "-0.02em" }}
-            >
-              Environmental Monitoring
-            </h1>
+          <header className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              {/* Mobile menu button */}
+              <button
+                onClick={() => setMobileSidebarOpen(true)}
+                className="p-2 rounded-lg md:hidden"
+                style={{
+                  background: "rgba(16, 185, 129, 0.15)",
+                  border: "1px solid rgba(16, 185, 129, 0.3)",
+                  color: "#059669",
+                }}
+              >
+                <MenuIcon className="w-5 h-5" />
+              </button>
+
+              <h1
+                className="text-3xl md:text-4xl font-bold text-slate-800"
+                style={{ letterSpacing: "-0.02em" }}
+              >
+                Environmental Monitoring
+              </h1>
+            </div>
+
             <p className="text-slate-500 flex items-center gap-2">
               <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 status-indicator"></span>
               Live data • Auto-refresh every 10 seconds
@@ -213,7 +238,7 @@ export default function SmartFarmDashboard() {
                 </ResponsiveContainer>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 pt-4">
+              <div className="space-y-4 pt-4">
                 <div
                   className="p-4 rounded-xl transition-all duration-300 hover:scale-[1.03]"
                   style={{
@@ -237,45 +262,48 @@ export default function SmartFarmDashboard() {
                     %
                   </p>
                 </div>
-                <div
-                  className="p-4 rounded-xl transition-all duration-300 hover:scale-[1.03]"
-                  style={{
-                    background: "rgba(16, 185, 129, 0.05)",
-                    border: "1px solid rgba(16, 185, 129, 0.1)",
-                  }}
-                >
-                  <p
-                    className="text-xs text-slate-500 uppercase mb-1"
-                    style={{ letterSpacing: "0.05em" }}
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div
+                    className="p-4 rounded-xl transition-all duration-300 hover:scale-[1.03]"
+                    style={{
+                      background: "rgba(16, 185, 129, 0.05)",
+                      border: "1px solid rgba(16, 185, 129, 0.1)",
+                    }}
                   >
-                    Minimum
-                  </p>
-                  <p className="text-lg font-bold text-slate-800">
-                    {moistureData.length > 0
-                      ? Math.min(...moistureData.map((d) => d.value)).toFixed(1)
-                      : "0"}
-                    %
-                  </p>
-                </div>
-                <div
-                  className="p-4 rounded-xl transition-all duration-300 hover:scale-[1.03]"
-                  style={{
-                    background: "rgba(16, 185, 129, 0.05)",
-                    border: "1px solid rgba(16, 185, 129, 0.1)",
-                  }}
-                >
-                  <p
-                    className="text-xs text-slate-500 uppercase mb-1"
-                    style={{ letterSpacing: "0.05em" }}
+                    <p
+                      className="text-xs text-slate-500 uppercase mb-1"
+                      style={{ letterSpacing: "0.05em" }}
+                    >
+                      Minimum
+                    </p>
+                    <p className="text-lg font-bold text-slate-800">
+                      {moistureData.length > 0
+                        ? Math.min(...moistureData.map((d) => d.value)).toFixed(1)
+                        : "0"}
+                      %
+                    </p>
+                  </div>
+                  <div
+                    className="p-4 rounded-xl transition-all duration-300 hover:scale-[1.03]"
+                    style={{
+                      background: "rgba(16, 185, 129, 0.05)",
+                      border: "1px solid rgba(16, 185, 129, 0.1)",
+                    }}
                   >
-                    Maximum
-                  </p>
-                  <p className="text-lg font-bold text-slate-800">
-                    {moistureData.length > 0
-                      ? Math.max(...moistureData.map((d) => d.value)).toFixed(1)
-                      : "0"}
-                    %
-                  </p>
+                    <p
+                      className="text-xs text-slate-500 uppercase mb-1"
+                      style={{ letterSpacing: "0.05em" }}
+                    >
+                      Maximum
+                    </p>
+                    <p className="text-lg font-bold text-slate-800">
+                      {moistureData.length > 0
+                        ? Math.max(...moistureData.map((d) => d.value)).toFixed(1)
+                        : "0"}
+                      %
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -330,7 +358,7 @@ export default function SmartFarmDashboard() {
                     boxShadow: "0 8px 16px rgba(5, 150, 105, 0.25)",
                   }}
                 >
-                  <Wind className="w-8 h-8 text-white" />
+                  <Thermometer className="w-8 h-8 text-white" />
                 </div>
               </div>
 
@@ -359,14 +387,14 @@ export default function SmartFarmDashboard() {
                       orientation="left"
                       stroke="#F59E0B"
                       tick={{ fontSize: 12, fill: "#F59E0B" }}
-                      domain={['auto', 'auto']}
+                      domain={["auto", "auto"]}
                     />
                     <YAxis
                       yAxisId="right"
                       orientation="right"
                       stroke="#3B82F6"
                       tick={{ fontSize: 12, fill: "#3B82F6" }}
-                      domain={['auto', 'auto']}
+                      domain={["auto", "auto"]}
                     />
                     <Legend wrapperStyle={{ fontSize: "12px" }} />
                     <Tooltip
