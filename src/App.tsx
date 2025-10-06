@@ -1,5 +1,4 @@
 import './App.css';
-import BarChartComponent from '../src/test';
 import Dashboard from '../src/Dashboard';
 
 function App() {

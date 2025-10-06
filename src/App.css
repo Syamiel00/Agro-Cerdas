@@ -1,7 +1,18 @@
+/* 
+  This file is intentionally left minimal since we're using Tailwind CSS for styling.
+  Global styles are defined in index.css
+*/
+
+.App {
+  min-height: 100vh;
+}
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  /* Removed max-width constraint to allow full screen */
+  /* max-width: 1280px; */
+  /* Changed from margin: 0 auto to margin: 0 for full width */
+  margin: 0;
+  /* padding: 2rem; */
   text-align: center;
 }
 
